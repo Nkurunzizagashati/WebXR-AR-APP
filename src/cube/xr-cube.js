@@ -19,6 +19,7 @@ const light = new THREE.AmbientLight(0xffffff, 1.0);
 scene.add(light);
 
 const cube = new THREE.Mesh(geometry, material);
+cube.position.set(0, 0, -2);
 
 scene.add(cube);
 
