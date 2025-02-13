@@ -3,65 +3,45 @@ import { ARButton } from 'three/examples/jsm/Addons.js';
 
 const scene = new THREE.Scene();
 
-const sizes = {
-	width: window.innerWidth,
-	height: window.innerHeight,
-};
-
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-
-const material = new THREE.MeshStandardMaterial({
-	color: 0xffffff * Math.random(),
-});
-
-const light = new THREE.AmbientLight(0xffffff, 1.0);
-
-scene.add(light);
+const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5); // Bigger cube
+const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
 
 const cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 0, -2);
-
+cube.position.set(0, -0.5, -1); // Move it lower & closer
 scene.add(cube);
+
+// Lighting
+const light = new THREE.AmbientLight(0xffffff, 1.5);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+directionalLight.position.set(1, 1, 1);
+scene.add(light, directionalLight);
 
 const camera = new THREE.PerspectiveCamera(
 	75,
-	sizes.width / sizes.height,
+	window.innerWidth / window.innerHeight,
 	0.1,
 	1000
 );
-
-camera.position.set(0, 2, 5);
-camera.lookAt(new THREE.Vector3(0, 0, 0));
-
 scene.add(camera);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-
-renderer.setSize(sizes.width, sizes.height);
+const renderer = new THREE.WebGLRenderer({
+	antialias: true,
+	alpha: true,
+}); // Transparent background
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-
 renderer.xr.enabled = true;
-
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(ARButton.createButton(renderer));
 
-renderer.setAnimationLoop(render);
+// AR Button
+document.body.appendChild(
+	ARButton.createButton(renderer, {
+		requiredFeatures: ['local-floor'],
+	})
+);
 
-function render() {
+// Animation Loop
+renderer.setAnimationLoop(() => {
 	cube.rotation.y += 0.01;
 	renderer.render(scene, camera);
-}
-
-window.addEventListener('resize', () => {
-	// Update sizes
-	sizes.width = window.innerWidth;
-	sizes.height = window.innerHeight;
-
-	// Update camera
-	camera.aspect = sizes.width / sizes.height;
-	camera.updateProjectionMatrix();
-
-	// Update renderer
-	renderer.setSize(sizes.width, sizes.height);
-	renderer.setPixelRatio(window.devicePixelRatio);
 });
